@@ -1,7 +1,7 @@
 <?php exit;?>{
     "url": "",
-    "cid": ,
-    "mid": ,
+    "cid": null,
+    "mid": null,
     "time_code": "",
     "openid": ["openid1","openid2"],
     "flag": "0",
