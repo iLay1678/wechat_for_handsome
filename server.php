@@ -1,7 +1,6 @@
 <?php
 require __DIR__.'/vendor/autoload.php';
-require_once 'Config.class.php';
-include 'wechat_config.php';
+include 'config.php';
 use EasyWeChat\Factory;
 
 function request_post($url = '', $post_data = array()) {
@@ -35,10 +34,8 @@ function request_post($url = '', $post_data = array()) {
     return $data;
 }
 
-function push($content,$msg_type) {
-    $C = new Config('config');
-    $url = $C->get('url', '');
-    $desp = array('cid' => $C->get('cid', ''),'mid' => $C->get('mid', ''), 'content' => $content,'action' => "send_talk",'time_code' => md5($C->get('time_code', '')),'msg_type' => $msg_type,'token' => 'weixin');
+function push($content,$msg_type,$url,$timecode,$cid,$mid) {
+    $desp = array('cid' => $cid,'mid' => $mid, 'content' => $content,'action' => "send_talk",'time_code' => md5($timecode),'msg_type' => $msg_type,'token' => 'weixin');
     $res = request_post($url, $desp);
     return $res;
 }
@@ -85,141 +82,156 @@ function update() {
 }
 $app = Factory::officialAccount($config);
 $app->server->push(function ($message) {
-    $C = new Config('config');
-    if ($message['Content'] == "openid") {
-        return $message['FromUserName'];
-    }
-    if ($message['Content'] == "更新") {
-        return update();
-    }
-    if ($message['Content'] == "帮助") {
-        return '<a href=\'https://handsome2.ihewro.com/#/wechat?id=向时光机发送消息\'>打开帮助</a>';
-    }
-    if ($message['Content'] == "文章") {
-        return '<a href=\''.$C->get('url', '').'/admin/write-post.php\'>发布文章</a>';
-    }
-    if ($message['Content'] == "博客") {
-        return '<a href=\''.$C->get('url', '').'\'>打开博客</a>';
-    }
-    if ($message['Content'] == "文章") {
-        return '<a href=\''.$C->get('url', '').'/admin/write-post.php\'>发布文章</a>';
-    }
-    if (in_array($message['FromUserName'],$C->get('openid', '0'))) {
-        $C = new Config('config');
-        if ($message['Content'] == "开始" || $C->get('flag', '0') == 1) {
-            $status = "当前处于混合消息模式，请继续，发送『结束』结束本次发送~";
-            $C->set('flag', '1');
-            $C->set('ok', '0');
-            $C->save();
-        }
-        if ($message['Content'] == "结束") {
-            $C->set('flag', '2');
-            $C->set('ok', '1');
-            $C->set('content', '');
-            $C->save();
-        }
-        if ($message['Content'] == "发文章" || $C->get('flag', '0') == 3) {
-            $status = "当前处于发送文章模式，请继续，发送『完成』即可发布文章~";
-            $C->set('flag', '3');
-            $C->set('ok', '0');
-            $C->save();
-        }
-        if ($message['Content'] == "完成") {
-            $C->set('flag', '4');
-            $C->set('ok', '1');
-            $C->set('content', '');
-            $C->save();
-        }
-        $flag=$C->get('flag', '0');
-        if ($flag == 2) {
-            $msg_type = "mixed_talk";
-            $C->set('content', '');
-            $C->set('flag', '0');
-            $C->set('msg_type', $msg_type);
-            $C->save();
-        }
-        if ($flag == 4) {
-            $msg_type = "mixed_post";
-            $C->set('content', '');
-            $C->set('flag', '0');
-            $C->set('msg_type', $msg_type);
-            $C->save();
-        }
-        if ($flag == 1||$flag == 3) {
-            if ($message['MsgType'] == "location") {
-                $content = $message['Location_X'] . "#" . $message['Location_Y'] . "#" . $message['Label'] . "#http://restapi.amap.com/v3/staticmap?location=" . $message['Location_Y'] . "," . $message['Location_X'] . "&zoom=10&size=750*300&markers=mid,,A:" . $message['Location_Y'] . "," . $message['Location_X'] . "&key=2a5048a9ad453654e037b6a68abd13c4";
+    include 'config.php';
+    $openid = $message['FromUserName'];
+    $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+    $url = $arr['url'];
+    $cid = $arr['cid'];
+    $mid = $arr['mid'];
+    $timecode = $arr['timecode'];
+    $content = $arr['content'];
+    switch ($message['Content']) {
+        case 'openid':
+            return $message['FromUserName'];
+            break;
+        case "更新":
+            return update();
+            break;
+        case "绑定":
+            if(isset($url)){
+                return "<a href='$url_dir"."bind.php?openid=$openid'>您已绑定，点击查看或修改</a>";
+            }else{
+                return "<a href='$url_dir"."bind.php?openid=$openid'>点击绑定</a>";
             }
-            if ($message['MsgType'] == "image") {
-                $content = $message['PicUrl'];
-            }
-            if ($message['MsgType'] == "link") {
-                $content = $message['Title']."#".$message['Description']."#".$message['Url'];
-            }
-            if ($message['MsgType'] == "text") {
-                if (substr($message['Content'],0,1) == "#") {
-                    $content = '[secret]'.substr($message['Content'],1).'[/secret]';
-                } else {
-                    $content = $message['Content'];
+            break;
+        case "帮助":
+            return '<a href=\'https://handsome2.ihewro.com/#/wechat?id=向时光机发送消息\'>打开帮助</a>';
+            break;
+        default:
+            if (isset($timecode)) {
+                switch ($message['Content']) {
+                    case '文章':
+                        return '<a href=\''.$url.'/admin/write-post.php\'>发布文章</a>';
+                        break;
+                    case "博客":
+                        return '<a href=\''.$url.'\'>打开博客</a>';
+                        break;
+                    default:
+                        switch ($message['Content']) {
+                            case '发文章':
+                                $msg_type = 'mixed_post';
+                                $db->query("update `cross` set msg_type='$msg_type',content='' where openid='$openid'");
+                                return "开启博文构造模式，请继续发送消息，下面的消息最后将组成一篇完整的文章发送到博客，发送『结束』结束本次发送~";
+                                break;
+                            case "开始":
+                                $msg_type = 'mixed_talk';
+                                $db->query("update `cross` set msg_type='$msg_type',content='' where openid='$openid'");
+                                return "当前处于混合消息模式，请继续，发送『结束』结束本次发送~";
+                                break;
+                            case "结束":
+                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+                                $str = $arr['content'];
+                                $msg_type = $arr['msg_type'];
+                                $arr = mb_split('@',$str);
+                                $m = count($arr);
+                                for ($i = 0;$i < $m-1;$i++) {
+                                    $con[$i] = mb_split('->',$arr[$i]);
+                                }
+                                $m1 = count($con);
+                                for ($m = 0;$m < $m1;$m++) {
+                                    $result[$m] = array('type' => $con[$m][0],'content' => $con[$m][1]);
+                                }
+                                $content = array('results' => $result);
+                                $status = push(json_encode($content),$msg_type,$url,$timecode,$cid,$mid);
+                                $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
+                                switch ($status) {
+                                    case "1":
+                                        return "biubiubiu~发送成功";
+                                        break;
+                                    case "-3":
+                                        return "身份验证失败";
+                                        break;
+                                    default:
+                                        return $status;
+                                }
+                                break;
+                            default:
+                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+                                $buffer = $arr['content'];
+                                $type = $arr['msg_type'];
+                                switch ($message['MsgType']) {
+                                    case "location":
+                                        $content = $message['Location_X'] . "#" . $message['Location_Y'] . "#" . $message['Label'] . "#http://restapi.amap.com/v3/staticmap?location=" . $message['Location_Y'] . "," . $message['Location_X'] . "&zoom=10&size=750*300&markers=mid,,A:" . $message['Location_Y'] . "," . $message['Location_X'] . "&key=2a5048a9ad453654e037b6a68abd13c4";
+                                        $msg_type = "location";
+                                        if ($type == 'mixed_talk' || $type == 'mixed_post') {
+                                            $content = $buffer.$msg_type."->".$content."@";
+                                        }
+                                        $db->query("update `cross` set content='$content' where openid='$openid'");
+                                        break;
+                                    case "image":
+                                        $content = $message['PicUrl'];
+                                        $msg_type = "image";
+                                        if ($type == 'mixed_talk' || $type == 'mixed_post') {
+                                            $content = $buffer.$msg_type."->".$content."@";
+                                        }
+                                        $db->query("update `cross` set content='$content' where openid='$openid'");
+                                        break;
+                                    case "link":
+                                        $content = $message['Title']."#".$message['Description']."#".$message['Url'];
+                                        $msg_type = "link";
+                                        if ($type == 'mixed_talk' || $type == 'mixed_post') {
+                                            $content = $buffer.$msg_type."->".$content."@";
+                                        }
+                                        $db->query("update `cross` set content='$content' where openid='$openid'");
+                                        break;
+                                    case "text":
+                                        if (substr($message['Content'],0,1) == "#") {
+                                            $content = '[secret]'.substr($message['Content'],1).'[/secret]';
+                                        } else {
+                                            $content = $message['Content'];
+                                        }
+                                        $msg_type = "text";
+                                        if ($type == 'mixed_talk' || $type == 'mixed_post') {
+                                            $content = $buffer.$msg_type."->".$content."@";
+                                        }
+                                        $db->query("update `cross` set content='$content' where openid='$openid'");
+                                        break;
+                                    default:
+                                        return "不支持的消息类型";
+                                }
+                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+                                $content = $arr['content'];
+                                $type = $arr['msg_type'];
+                                switch ($type) {
+                                    case 'mixed_post':
+                                        return "请继续，发送『结束』结束本次发送~";
+                                        $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
+                                        break;
+                                    case 'mixed_talk':
+                                        return "请继续，发送『结束』结束本次发送~";
+                                        $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
+                                        break;
+                                    default:
+                                        $status = push($content,$msg_type,$url,$timecode,$cid,$mid);
+                                        $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
+                                        switch ($status) {
+                                            case "1":
+                                                return "biubiubiu~发送成功";
+                                                break;
+                                            case "-3":
+                                                return "身份验证失败";
+                                                break;
+                                            default:
+                                                return $status;
+                                        }
+                                }
+                        }
                 }
-            }
-            $buffer = $message['MsgType']."->".$content."@";
-            file_put_contents("content.txt", $buffer, FILE_APPEND);
-        }
-        if ($flag == 0) {
-            $msg_type = $message['MsgType'];
-            if ($msg_type == "location") {
-                $content = $message['Location_X'] . "#" . $message['Location_Y'] . "#" . $message['Label'] . "#http://restapi.amap.com/v3/staticmap?location=" . $message['Location_Y'] . "," . $message['Location_X'] . "&zoom=10&size=750*300&markers=mid,,A:" . $message['Location_Y'] . "," . $message['Location_X'] . "&key=2a5048a9ad453654e037b6a68abd13c4";
-            }
-            if ($msg_type == "image") {
-                $content = $message['PicUrl'];
-            }
-            if ($message['MsgType'] == "link") {
-                $content = $message['Title']."#".$message['Description']."#".$message['Url'];
-            }
-            if ($msg_type == "text") {
-                if (substr($message['Content'],0,1) == "#") {
-                    $content = '[secret]'.substr($message['Content'],1).'[/secret]';
-                } else {
-                    $content = $message['Content'];
-                }
-            }
-            $C->set('content', $content);
-            $C->set('msg_type', $msg_type);
-            $C->save();
-        }
-        if ($C->get('ok', '0') == 1||$C->get('ok', '0') == 3) {
-            if (file_exists("content.txt")) {
-                $file_path = "content.txt";
-                if (file_exists($file_path)) {
-                    $str = file_get_contents($file_path);
-                    //将整个文件内容读入到一个字符串中
-                    $str = str_replace("text->开始@","",$str);
-                    $str = str_replace("text->发文章@","",$str);
-                    $arr = mb_split('@',$str);
-                    $m = count($arr);
-                    for ($i = 0;$i < $m-1;$i++) {
-                        $con[$i] = mb_split('->',$arr[$i]);
-                    }
-                    $m1 = count($con);
-                    for ($m = 0;$m < $m1;$m++) {
-                        $result[$m] = array('type' => $con[$m][0],'content' => $con[$m][1]);
-                    }
-                    $content = array('results' => $result);
-                }
-                $content = json_encode($content);
-                unlink('content.txt');
             } else {
-                $content = $C->get('content', '');
+                return "<a href='$url_dir"."bind.php?openid=$openid'>您还未绑定，点击绑定</a>";
             }
-            $status = push($content , $C->get('msg_type', ''));
-        }
-        if ($status == "1") {
-            $status = "biubiubiu~发送成功";
-        }
-        return $status;
-    } else {
-        return "没有操作权限！";
     }
+
 });
 
 $response = $app->server->serve();

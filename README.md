@@ -7,6 +7,7 @@
 ## 微信公众号服务端 for handsome主题
 ## *本项目需要配合handsome主题的时光机使用*
 ## 更新日志
+2019.10.24 全面重构，自由绑定，使用方法与官方无异，且绑定更便捷
 
 2019.4.18 初始版本
 
@@ -26,29 +27,25 @@ PHP SimpleXML 扩展
 
 PHP fileinfo 拓展
 
+MYSQL
+
 ## 食用方法
  1、拷贝项目到你的服务器
  
-2、修改wechat_config.php文件中的app_id、secret、token、aes_key 相关信息自行从微信公众号后台获取
+2、将cross.sql导入数据库
 
 3、在公众号后台服务器配置填写服务器地址为 项目所在网址/server.php 并启用服务器配置
 
-4、 修改config.php文件中的url,cid,time_code
+4、修改config.php文件中的相关信息
 
-|   字段    |         说明          |
-| --------- | --------------------- |
-| url       | 你的博客地址           |
-| cid       | 时光机页面的cid，不要加引号，直接填数字        |
-|mid        |要发布文章的分类mid，不要加引号，直接填数字 |
-| time_code | 时光机验证编码 |
 
-5、向公众号发送消息试试，是不是提示 ‘没有操作权限’ 不要紧，请看下一步
+5、向公众号绑定，点击链接进行绑定
+
  
-6、设置管理员openid，防止其他关注者调用
-openid位于config.php中的openid字段，获取方法：向你的公众号发送openid,即可收到你的openid
+6、配置完成，尽情使用吧！使用方法同handsome官方时光机发送公众号
 
-
- 配置完成，尽情使用吧！使用方法同handsome官方时光机发送公众号
-
+## 效果展示 
+ ![1](/src/1.jpg)
+ ![2](/src/2.jpg)
 
   [1]: https://github.com/iLay1678/wechat_for_handsome
