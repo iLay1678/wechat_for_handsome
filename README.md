@@ -45,7 +45,7 @@ MYSQL
 6、配置完成，尽情使用吧！使用方法同handsome官方时光机发送公众号
 
 ## 效果展示 
- ![1](/src/1.jpg)
- ![2](/src/2.jpg)
+ ![1](/img/1.jpg)
+ ![2](/img/2.jpg)
 
   [1]: https://github.com/iLay1678/wechat_for_handsome
