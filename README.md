@@ -25,9 +25,9 @@ PHP OpenSSL 扩展
 
 PHP SimpleXML 扩展
 
-PHP fileinfo 拓展
+PHP fileinfo 扩展
 
-MYSQL
+PHP PDO_MYSQL 扩展
 
 ## 食用方法
 1、拷贝项目到你的服务器

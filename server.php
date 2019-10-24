@@ -84,7 +84,7 @@ $app = Factory::officialAccount($config);
 $app->server->push(function ($message) {
     include 'config.php';
     $openid = $message['FromUserName'];
-    $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+    $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
     $url = $arr['url'];
     $cid = $arr['cid'];
     $mid = $arr['mid'];
@@ -160,7 +160,7 @@ $app->server->push(function ($message) {
                                 return "当前处于混合消息模式，请继续，发送『结束』结束本次发送~";
                                 break;
                             case "结束":
-                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
                                 $str = $arr['content'];
                                 if($str==null){
                                     $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
@@ -198,7 +198,7 @@ $app->server->push(function ($message) {
                                 }
                                 break;
                             default:
-                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
                                 $buffer = $arr['content'];
                                 $type = $arr['msg_type'];
                                 switch ($message['MsgType']) {
@@ -242,7 +242,7 @@ $app->server->push(function ($message) {
                                         return "不支持的消息类型";
                                         exit();
                                 }
-                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+                                $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
                                 $content = $arr['content'];
                                 $type = $arr['msg_type'];
                                 switch ($type) {

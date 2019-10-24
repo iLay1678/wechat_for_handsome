@@ -1,6 +1,17 @@
 <?php
 $url_dir='https://tools.ifking.cn/cross/'; //网址目录，以/结尾
-$db=mysqli_connect("127.0.0.1","用户名","密码","数据库名"); 
+$mysql_conf = array(
+    'host'    => '127.0.0.1:3306', 
+    'db'      => '', 
+    'db_user' => '', 
+    'db_pwd'  => '', 
+    );
+
+try{
+$db=new PDO("mysql:host=" . $mysql_conf['host'] . ";dbname=" . $mysql_conf['db'], $mysql_conf['db_user'], $mysql_conf['db_pwd']);
+}catch(PDOException $e){
+    die('数据库连接失败:' . $e->getMessage());
+}
 $config = [
     'app_id' => '',
     'secret' => '',
@@ -25,7 +36,3 @@ $config = [
         ],
     ],
 ];
-if (mysqli_connect_errno($db)) 
-{ 
-    echo "连接 MySQL 失败: " . mysqli_connect_error(); 
-} 

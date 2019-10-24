@@ -1,7 +1,7 @@
 <?php
 include 'config.php';
 $openid = isset($_GET['openid'])?$_GET['openid']:$_POST['openid'];
-$arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
+$arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
 $url = $arr['url'];
 $cid = $arr['cid'];
 $mid = $arr['mid'];
