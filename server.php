@@ -163,8 +163,8 @@ $app->server->push(function ($message) {
                                 $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
                                 $str = $arr['content'];
                                 if($str==null){
-                                    return "已结束，本次操作未发送任何信息~";
                                     $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
+                                    return "已结束，本次操作未发送任何信息~";
                                     exit();
                                 }
                                 $msg_type = $arr['msg_type'];
