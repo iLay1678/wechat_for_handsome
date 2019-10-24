@@ -62,7 +62,7 @@ else:
                                 <label class="weui-label">openid</label>
                             </div>
                             <div class="weui-cell__bd">
-                                <input id="js_input" name="openid" class="weui-input" value="<?php echo $openid;
+                                <input id="js_input" name="openid" readonly class="weui-input" value="<?php echo $openid;
                                 ?>">
                             </div>
                         </div>
