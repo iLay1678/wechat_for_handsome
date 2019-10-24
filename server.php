@@ -1,5 +1,5 @@
 <?php
-require __DIR__.'/vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 include 'config.php';
 use EasyWeChat\Factory;
 
@@ -74,7 +74,7 @@ function update() {
             file_put_contents("update.log","无需更新  ".$filename."\n", FILE_APPEND);
         }
     }
-    file_put_contents("update.log","\n\n更新完成\n\n支持绑定多个微信号，支持发布文章\n\n请重新修改配置文件", FILE_APPEND);
+    file_put_contents("update.log","\n\n更新完成", FILE_APPEND);
     $result = file_get_contents("update.log");
     unlink("update.log");
     return $result;
@@ -98,14 +98,45 @@ $app->server->push(function ($message) {
             return update();
             break;
         case "绑定":
-            if(isset($url)){
+            if (isset($url)) {
                 return "<a href='$url_dir"."bind.php?openid=$openid'>您已绑定，点击查看或修改</a>";
-            }else{
+            } else {
                 return "<a href='$url_dir"."bind.php?openid=$openid'>点击绑定</a>";
             }
             break;
+        case "解除绑定":case "解绑":
+            if ($db->query("DELETE FROM `cross` WHERE openid='{$openid}'")) {
+                return "已经解除绑定";
+            } else {
+                return "操作失败，未知错误";
+            }
+            break;
         case "帮助":
-            return '<a href=\'https://handsome2.ihewro.com/#/wechat?id=向时光机发送消息\'>打开帮助</a>';
+            return '1.发送 绑定 进行绑定或修改绑定信息
+2.向时光机发送消息
+支持文字、图片、地理位置、链接四种消息类型。
+
+其他消息类型等后续开发，暂不支持（如果发送了，会提示不支持该类型的，如语音消息）。
+
+如果发送的是图片会自动将图片存放到typecho 的 usr/uploads/time 目录下。
+
+支持发送私密说说。只需要在发送内容前加入#即可。 举例发送：#这是私密的说说，仅发送者可见。
+
+连续发送多条信息
+发送【开始】，开始一轮连续发送
+发送【结束】，结束当前轮的发送
+
+3.发送文章
+输入【发文章】，开始文章发送，支持多条消息，支持多条消息图文混合
+输入【结束】，结束文章发送
+
+4.其他操作
+发送 博客收到你的博客地址的链接
+发送 发博客收到发博文的字的链接
+发送 解除绑定 或 解绑 可删除掉你的绑定信息
+发送 帮助 查看帮助信息
+
+5.<a href=\'https://handsome2.ihewro.com/#/wechat?id=向时光机发送消息\'>图文教程</a>';
             break;
         default:
             if (isset($timecode)) {
@@ -131,6 +162,10 @@ $app->server->push(function ($message) {
                             case "结束":
                                 $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
                                 $str = $arr['content'];
+                                if($str==null){
+                                    return "已结束，本次操作未发送任何信息~";
+                                    exit();
+                                }
                                 $msg_type = $arr['msg_type'];
                                 $arr = mb_split('@',$str);
                                 $m = count($arr);
@@ -198,6 +233,7 @@ $app->server->push(function ($message) {
                                         break;
                                     default:
                                         return "不支持的消息类型";
+                                        exit();
                                 }
                                 $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch_array();
                                 $content = $arr['content'];

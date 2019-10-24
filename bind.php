@@ -7,19 +7,24 @@ $cid = $arr['cid'];
 $mid = $arr['mid'];
 $mid = $arr['mid'];
 $timecode = $arr['timecode'];
-$id=$arr['id'];
-if (isset($_POST['url'])) {
+$id = $arr['id'];
+if ($_POST['openid']!=null):
     $url = $_POST['url'];
     $cid = $_POST['cid'];
     $mid = $_POST['mid'];
     $mid = $_POST['mid'];
     $timecode = $_POST['timecode'];
     if (!isset($id)) {
-    $db->query("INSERT INTO `cross` (openid, url,timecode,cid,mid) VALUES ('{$openid}', '{$url}','{$timecode}', '{$cid}','{$mid}')");
-}else{
-    $db->query("update `cross` set url='$url', timecode='$timecode', cid='$cid', mid='$mid' where openid='$openid'");
-}
-}
+        if ($db->query("INSERT INTO `cross` (openid, url,timecode,cid,mid) VALUES ('{$openid}', '{$url}','{$timecode}', '{$cid}','{$mid}')")) {
+            die('1');
+        }
+    } else {
+        if ($db->query("update `cross` set url='$url', timecode='$timecode', cid='$cid', mid='$mid' where openid='$openid'")) {
+             die('2');
+        }
+    }
+    die();
+else:
 ?>
 <html lang="zh-cmn-Hans">
 <head>
@@ -27,13 +32,11 @@ if (isset($_POST['url'])) {
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
     <title>时光机绑定</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/2.1.3/weui.css">
-
     <script src="./zepto.min.js"></script>
 </head>
 <body ontouchstart="">
     <div class="page">
-        <form class="weui-form" action="<?php echo $url_dir;
-            ?>bind.php" method="post">
+        <form class="weui-form" id="form">
             <div class="weui-form__text-area">
                 <h2 class="weui-form__title">时光机绑定</h2>
                 <div class="weui-form__desc">
@@ -95,7 +98,7 @@ if (isset($_POST['url'])) {
             </div>
 
             <div class="weui-form__opr-area">
-                <input type="submit" class="weui-btn weui-btn_primary weui-btn_disabled" id="showTooltips">
+                <a href="javascript:;" class="weui-btn weui-btn_primary" id="bind">绑定</a>
             </div>
 
             <div class="weui-form__extra-area">
@@ -109,35 +112,37 @@ if (isset($_POST['url'])) {
                 </div>
             </div>
         </form>
-        <div id="js_toast" style="display: none;">
-            <div class="weui-mask_transparent"></div>
-            <div class="weui-toast">
-                <i class="weui-icon-success-no-circle weui-icon_toast"></i>
-                <p class="weui-toast__content">
-                    已完成
-                </p>
+        <div class="js_dialog" id="Dialog" style="opacity: 0; display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd" id="msg">
+                    1
+                </div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:$('#Dialog').fadeOut(200);" class="weui-dialog__btn weui-dialog__btn_primary">知道了</a>
+                </div>
             </div>
         </div>
+
     </div>
     <script type="text/javascript">
         $(function() {
             var $toast = $('#js_toast');
-            var $input = $('#js_input');
-            $input.on('input', function() {
-                if ($input.val()) {
-                    $('#showTooltips').removeClass('weui-btn_disabled');
-                } else {
-                    $('#showTooltips').addClass('weui-btn_disabled');
-                }
-            });
-            $('#showTooltips').on('click', function() {
-                if ($(this).hasClass('weui-btn_disabled')) return;
-                // toptips的fixed, 如果有`animation`, `position: fixed`不生效
-                $('.page.cell').removeClass('slideIn');
-                $toast.fadeIn(100);
-                setTimeout(function () {
-                    $toast.fadeOut(100);
-                }, 2000);
+            var $Dialog = $('#Dialog');
+            var $msg = $('#msg');
+            $('#bind').on('click', function() {
+                $('#bind').addClass('weui-btn_loading');
+                $.post('<?php echo $url_dir;?>bind.php', $('#form').serialize(), function(response) {
+                    if (response == '1') {
+                        $msg.html('绑定成功');
+                    } else if (response == '2') {
+                        $msg.html('修改成功');
+                    } else {
+                        $msg.html('失败，请检查输入参数是否正确');
+                    }
+                    $Dialog.fadeIn(200);
+                    $('#bind').removeClass('weui-btn_loading');
+                })
             });
             function onBridgeReady() {
                 WeixinJSBridge.call('hideOptionMenu');
@@ -153,17 +158,8 @@ if (isset($_POST['url'])) {
             } else {
                 onBridgeReady();
             }
-            if (isWeixin) {
-                window.alert = function(name) {
-                    var iframe = document.createElement("IFRAME");
-                    iframe.style.display = "none";
-                    iframe.setAttribute("src", 'data:text/plain,');
-                    document.documentElement.appendChild(iframe);
-                    window.frames[0].window.alert(name);
-                    iframe.parentNode.removeChild(iframe);
-                }
-            }
         });
     </script>
 </body>
 </html>
+<?php endif;?>
