@@ -164,6 +164,7 @@ $app->server->push(function ($message) {
                                 $str = $arr['content'];
                                 if($str==null){
                                     return "已结束，本次操作未发送任何信息~";
+                                    $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
                                     exit();
                                 }
                                 $msg_type = $arr['msg_type'];
