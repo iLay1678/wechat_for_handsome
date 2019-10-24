@@ -184,6 +184,9 @@ $app->server->push(function ($message) {
                                     case "1":
                                         return "biubiubiu~发送成功";
                                         break;
+									case "-1":
+                                        return "请求参数错误";
+                                        break;
 									case "-2":
                                         return "信息缺失";
                                         break;
