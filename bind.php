@@ -132,7 +132,7 @@ else:
             var $msg = $('#msg');
             $('#bind').on('click', function() {
                 $('#bind').addClass('weui-btn_loading');
-                $.post('<?php echo $url_dir;?>bind.php', $('#form').serialize(), function(response) {
+                $.post('<?php echo  ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';echo $_SERVER["HTTP_HOST"].dirname($_SERVER['SCRIPT_NAME']);?>/bind.php', $('#form').serialize(), function(response) {
                     if (response == '1') {
                         $msg.html('绑定成功');
                     } else if (response == '2') {

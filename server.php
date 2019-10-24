@@ -1,5 +1,5 @@
 <?php
-require __DIR__.'/vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 include 'config.php';
 use EasyWeChat\Factory;
 
@@ -83,6 +83,7 @@ function update() {
 $app = Factory::officialAccount($config);
 $app->server->push(function ($message) {
     include 'config.php';
+    $http_type=((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://'; 
     $openid = $message['FromUserName'];
     $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
     $url = $arr['url'];
@@ -99,9 +100,9 @@ $app->server->push(function ($message) {
             break;
         case "绑定":
             if (isset($url)) {
-                return "<a href='$url_dir"."bind.php?openid=$openid'>您已绑定，点击查看或修改</a>";
+                return "<a href='".$http_type.$_SERVER["HTTP_HOST"].dirname($_SERVER['SCRIPT_NAME'])."/bind.php?openid=$openid'>您已绑定，点击查看或修改</a>";
             } else {
-                return "<a href='$url_dir"."bind.php?openid=$openid'>点击绑定</a>";
+                return "<a href='".$http_type.$_SERVER["HTTP_HOST"].dirname($_SERVER['SCRIPT_NAME'])."/bind.php?openid=$openid'>点击绑定</a>";
             }
             break;
         case "解除绑定":case "解绑":
@@ -184,12 +185,6 @@ $app->server->push(function ($message) {
                                     case "1":
                                         return "biubiubiu~发送成功";
                                         break;
-									case "-1":
-                                        return "请求参数错误";
-                                        break;
-									case "-2":
-                                        return "信息缺失";
-                                        break;
                                     case "-3":
                                         return "身份验证失败";
                                         break;
@@ -261,6 +256,12 @@ $app->server->push(function ($message) {
                                             case "1":
                                                 return "biubiubiu~发送成功";
                                                 break;
+                                            case "-1":
+                                                return "请求参数错误";
+                                                break;
+                                            case "-2":
+                                                return "信息缺失";
+                                                break;
                                             case "-3":
                                                 return "身份验证失败";
                                                 break;
@@ -271,7 +272,7 @@ $app->server->push(function ($message) {
                         }
                 }
             } else {
-                return "<a href='$url_dir"."bind.php?openid=$openid'>您还未绑定，点击绑定</a>";
+                return "<a href='".$http_type.$_SERVER["HTTP_HOST"].dirname($_SERVER['SCRIPT_NAME'])."/bind.php?openid=$openid'>您还未绑定，点击绑定</a>";
             }
     }
 
