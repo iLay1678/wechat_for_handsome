@@ -5,7 +5,6 @@ $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
 $url = $arr['url'];
 $cid = $arr['cid'];
 $mid = $arr['mid'];
-$mid = $arr['mid'];
 $timecode = $arr['timecode'];
 $id = $arr['id'];
 if ($_POST['openid']!=null):

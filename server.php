@@ -241,13 +241,8 @@ $app->server->push(function ($message) {
                                 $content = $arr['content'];
                                 $type = $arr['msg_type'];
                                 switch ($type) {
-                                    case 'mixed_post':
+                                  case 'mixed_post':case 'mixed_talk':
                                         return "请继续，发送『结束』结束本次发送~";
-                                        $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
-                                        break;
-                                    case 'mixed_talk':
-                                        return "请继续，发送『结束』结束本次发送~";
-                                        $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
                                         break;
                                     default:
                                         $status = push($content,$msg_type,$url,$timecode,$cid,$mid);
