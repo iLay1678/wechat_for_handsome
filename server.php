@@ -153,12 +153,16 @@ $app->server->push(function ($message) {
                             case '发文章':
                                 $msg_type = 'mixed_post';
                                 $db->query("update `cross` set msg_type='$msg_type',content='' where openid='$openid'");
-                                return "开启博文构造模式，请继续发送消息，下面的消息最后将组成一篇完整的文章发送到博客，发送『结束』结束本次发送~";
+                                return "开启博文构造模式，请继续发送消息，下面的消息最后将组成一篇完整的文章发送到博客，发送『结束』结束本次发送，发送『取消』取消本次发送~";
                                 break;
+                            case "取消":
+                                $db->query("update `cross` set msg_type='',content='' where openid='$openid'");
+                                return "已取消发送";
+                                break;    
                             case "开始":
                                 $msg_type = 'mixed_talk';
                                 $db->query("update `cross` set msg_type='$msg_type',content='' where openid='$openid'");
-                                return "当前处于混合消息模式，请继续，发送『结束』结束本次发送~";
+                                return "当前处于混合消息模式，请继续，发送『结束』结束本次发送，发送『取消』取消本次发送~";
                                 break;
                             case "结束":
                                 $arr = $db->query("SELECT * FROM `cross` WHERE openid='{$openid}'")->fetch();
@@ -241,8 +245,8 @@ $app->server->push(function ($message) {
                                 $content = $arr['content'];
                                 $type = $arr['msg_type'];
                                 switch ($type) {
-                                  case 'mixed_post':case 'mixed_talk':
-                                        return "请继续，发送『结束』结束本次发送~";
+                                    case 'mixed_post':case 'mixed_talk':
+                                        return "请继续，发送『结束』结束本次发送，发送『取消』取消本次发送~";
                                         break;
                                     default:
                                         $status = push($content,$msg_type,$url,$timecode,$cid,$mid);
