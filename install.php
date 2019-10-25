@@ -74,7 +74,7 @@ if($db->query($sql)){
 }catch(PDOException $e){
     die('数据库连接失败:' ."mysql:host=" . $host.":" .$port. ";dbname=" . $dbname. $dbuser.$dbpass. $e->getMessage());
 }
-    die("2");
+    die("参数错误");
 }
 ?>
 
@@ -195,7 +195,7 @@ if($db->query($sql)){
             <div class="weui-mask"></div>
             <div class="weui-dialog">
                 <div class="weui-dialog__bd" id="msg">
-                    1
+                    提示
                 </div>
                 <div class="weui-dialog__ft">
                     <a href="javascript:$('#Dialog').fadeOut(200);" class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
