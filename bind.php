@@ -103,7 +103,7 @@ else:
             <div class="weui-form__extra-area">
                 <div class="weui-footer">
                     <p class="weui-footer__links">
-                        <a href="https://ifking.cn" class="weui-footer__link">我若为王</a>
+                        <p class="weui-footer__links"> <a href="https://ifking.cn/p/113.html" class="weui-footer__link">搭建教程</a>
                     </p>
                     <p class="weui-footer__text">
                         Copyright © 2008-2019 iLay
@@ -115,7 +115,7 @@ else:
             <div class="weui-mask"></div>
             <div class="weui-dialog">
                 <div class="weui-dialog__bd" id="msg">
-                    1
+                    提示
                 </div>
                 <div class="weui-dialog__ft">
                     <a href="javascript:$('#Dialog').fadeOut(200);" class="weui-dialog__btn weui-dialog__btn_primary">知道了</a>
