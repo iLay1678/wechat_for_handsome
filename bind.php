@@ -106,7 +106,7 @@ else:
                         <p class="weui-footer__links"> <a href="https://ifking.cn/p/113.html" class="weui-footer__link">搭建教程</a>
                     </p>
                     <p class="weui-footer__text">
-                        Copyright © 2008-2019 iLay
+                         Copyright © 2019-<?php echo date("Y",time());?> iLay
                     </p>
                 </div>
             </div>
