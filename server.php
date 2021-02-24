@@ -46,6 +46,7 @@ function curl($url) {
     curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
     curl_setopt($curl, CURLOPT_TIMEOUT, 10);
     curl_setopt($curl, CURLOPT_REFERER, $url);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
     $result = curl_exec($curl);
     curl_close($curl);
     return $result;
