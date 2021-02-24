@@ -95,9 +95,9 @@ $app->server->push(function ($message) {
         case 'openid':
             return $message['FromUserName'];
             break;
-        case "更新":
-            return update();
-            break;
+        // case "更新":
+        //     return update();
+        //     break;
         case "绑定":
             if (isset($url)) {
                 return "<a href='".$http_type.$_SERVER["HTTP_HOST"].dirname($_SERVER['SCRIPT_NAME'])."/bind.php?openid=$openid'>您已绑定，点击查看或修改</a>";
@@ -116,27 +116,20 @@ $app->server->push(function ($message) {
             return '1.发送 绑定 进行绑定或修改绑定信息
 2.向时光机发送消息
 支持文字、图片、地理位置、链接四种消息类型。
-
 其他消息类型等后续开发，暂不支持（如果发送了，会提示不支持该类型的，如语音消息）。
-
 如果发送的是图片会自动将图片存放到typecho 的 usr/uploads/time 目录下。
-
 支持发送私密说说。只需要在发送内容前加入#即可。 举例发送：#这是私密的说说，仅发送者可见。
-
 连续发送多条信息
 发送【开始】，开始一轮连续发送
 发送【结束】，结束当前轮的发送
-
 3.发送文章
 输入【发文章】，开始文章发送，支持多条消息，支持多条消息图文混合
 输入【结束】，结束文章发送
-
 4.其他操作
 发送 博客收到你的博客地址的链接
 发送 发博客收到发博文的字的链接
 发送 解除绑定 或 解绑 可删除掉你的绑定信息
 发送 帮助 查看帮助信息
-
 5.<a href=\'https://handsome2.ihewro.com/#/wechat?id=向时光机发送消息\'>图文教程</a>';
             break;
         default:
