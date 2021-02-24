@@ -95,9 +95,9 @@ $app->server->push(function ($message) {
         case 'openid':
             return $message['FromUserName'];
             break;
-        // case "更新":
-        //     return update();
-        //     break;
+        case "更新":
+            return update();
+            break;
         case "绑定":
             if (isset($url)) {
                 return "<a href='".$http_type.$_SERVER["HTTP_HOST"].dirname($_SERVER['SCRIPT_NAME'])."/bind.php?openid=$openid'>您已绑定，点击查看或修改</a>";
