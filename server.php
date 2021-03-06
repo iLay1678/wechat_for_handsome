@@ -27,6 +27,8 @@ function request_post($url = '', $post_data = array()) {
     curl_setopt($ch, CURLOPT_POST, 1);
     //post提交方式
     curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, '0');
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, '0');
     $data = curl_exec($ch);
     //运行curl
     curl_close($ch);
